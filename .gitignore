@@ -1,0 +1,35 @@
+# Logs
+logs
+*.log
+
+# Dependencies
+node_modules
+
+# Build
+dist
+build
+*.local
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# IDE
+.vscode
+!.vscode/extensions.json
+.idea
+*.sw?
+*.suo
+*.ntvs*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Deploy
+scripts/
+freshkeep-deploy/
+
+# Test
+coverage

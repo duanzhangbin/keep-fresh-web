@@ -1,0 +1,96 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String    @id @default(cuid())
+  email     String?   @unique
+  phone     String?   @unique
+  password  String
+  name      String?
+  createdAt DateTime  @default(now()) @map("createdat")
+  
+  items                Item[]
+  categories           Category[]
+  locations            Location[]
+  settings             Settings?
+  pushSubscriptions    PushSubscription[]
+
+  @@map("users")
+}
+
+model Item {
+  id                 String    @id @default(cuid())
+  userId             String    @map("userid")
+  name               String
+  prodDate           String?   @map("proddate")
+  expDate            String?   @map("expdate")
+  category           String    @default("其它")
+  location           String    @default("储物柜")
+  status             Int       @default(0)
+  imagePath          String?   @map("imagepath")
+  openDate           String?   @map("opendate")
+  shelfLifeAfterOpen Int?      @map("shelflifeafteropen")
+  createdAt          DateTime  @default(now()) @map("createdat")
+  
+  user               User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@index([userId])
+  @@map("items")
+}
+
+model Category {
+  id        String   @id @default(cuid())
+  userId    String?  @map("userid")
+  name      String
+  icon      String?
+  color     String?
+  
+  user      User?    @relation(fields: [userId], references: [id])
+  
+  @@unique([userId, name])
+  @@map("categories")
+}
+
+model Location {
+  id        String   @id @default(cuid())
+  userId    String?  @map("userid")
+  name      String
+  icon      String?
+  color     String?
+  
+  user      User?    @relation(fields: [userId], references: [id])
+  
+  @@unique([userId, name])
+  @@map("locations")
+}
+
+model Settings {
+  userId             String  @id @map("userid")
+  reminderThreshold  Int     @default(7) @map("reminderthreshold")
+  reminderTime       String  @default("08:00") @map("remindertime")
+  pushEnabled       Boolean @default(true) @map("pushenabled")
+  
+  user               User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@map("settings")
+}
+
+model PushSubscription {
+  id           String   @id @default(cuid())
+  userId       String   @map("userid")
+  endpoint     String
+  p256dh       String
+  auth         String
+  createdAt    DateTime @default(now()) @map("createdat")
+  
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@index([userId])
+  @@map("push_subscriptions")
+}
